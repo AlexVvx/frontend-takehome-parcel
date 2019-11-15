@@ -7,8 +7,18 @@ interface Gem {
     documentation_uri: string;
 }
 
-class Main extends React.Component {
+interface State {
+    gems: Gem[];
+    savedGems: string[];
+}
+
+export function Gem(props) {
+    return <li key={props.text}>{props.text}{props.children}</li>
+}
+
+export class Main extends React.Component {
     gemsStorageKey = 'savedGems';
+    state: State;
 
     constructor(props) {
         super(props);
@@ -24,12 +34,11 @@ class Main extends React.Component {
             return <p>No results</p>
         }
         return list.map((gem) =>
-            <li key={gem.documentation_uri}>
-                {gem.documentation_uri}
+            <Gem text={gem.documentation_uri}>
                 <button
                     onClick={this.saveGem.bind(this, gem.documentation_uri)}
                 >{this.state.savedGems.indexOf(gem.documentation_uri) >= 0 ? 'saved' : 'save'}</button>
-            </li>
+            </Gem>
     }
 
     render() {
@@ -40,7 +49,7 @@ class Main extends React.Component {
     }
 
     handleChange(event: React.SyntheticEvent) {
-        fetch(`http://localhost:3000/api/v1/search.json?query=${event.target.value}`)
+        fetch(`http://localhost:3000/api/v1/search.json?query=${(event.target as HTMLInputElement).value}`)
             .then(res => res.json())
             .then(result => this.setState({ gems: result }));
     }
